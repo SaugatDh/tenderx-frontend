@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { Inter, Noto_Sans_Devanagari } from "next/font/google";
+import { Manrope, Noto_Sans_Devanagari } from "next/font/google";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n/request";
 import { AuthProvider } from "@/lib/auth-context";
 import { BidProvider } from "@/lib/bid-context";
 import { QueryProvider } from "@/lib/query-provider";
+import { RevealProvider } from "@/components/public/RevealProvider";
 import "../globals.css";
+import "../desk.css";
+import "../hero.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 const notoDevanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari"],
   variable: "--font-devanagari",
@@ -18,7 +25,19 @@ const notoDevanagari = Noto_Sans_Devanagari({
 
 export const metadata: Metadata = {
   title: "TenderX Nepal — Joint Venture Bid Workspace",
-  description: "Prepare, manage and generate joint-venture tender bid documents.",
+  description:
+    "Prepare joint-venture bids with partner details, signatures, documents, and reusable company profiles in one organised workspace.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+  openGraph: {
+    title: "TenderX Nepal — Joint Venture Bid Workspace",
+    description:
+      "Prepare joint-venture bids with partner details, signatures, documents, and reusable company profiles in one organised workspace.",
+    images: [{ url: "/logo.png", width: 321, height: 211, alt: "TenderX" }],
+  },
 };
 
 export function generateStaticParams() {
@@ -38,12 +57,14 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${notoDevanagari.variable}`}>
+    <html lang={locale} className={`${manrope.variable} ${notoDevanagari.variable}`}>
       <body>
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
             <AuthProvider>
-              <BidProvider>{children}</BidProvider>
+              <BidProvider>
+                <RevealProvider>{children}</RevealProvider>
+              </BidProvider>
             </AuthProvider>
           </QueryProvider>
         </NextIntlClientProvider>

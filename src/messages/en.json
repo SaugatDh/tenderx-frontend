@@ -1,11 +1,74 @@
 {
+  "editorial": {
+    "photoHeading": "Behind every bid, a person.",
+    "photoAlt": "A fictional Nepali contractor in a navy shirt reviewing printed bid details with a pen beside a laptop in a daylight office.",
+    "photoCaption": "Your expertise. A more organised desk.",
+    "heroNote": "The details you prepare today belong in your next bid, too.",
+    "bidFile": "Bid file",
+    "documentNumber": "Document 01 / 03",
+    "sample": "Sample",
+    "followBid": "See how a bid comes together"
+  },
+  "desk": {
+    "product": "Product",
+    "workflow": "Workflow",
+    "createWorkspace": "Create workspace",
+    "skip": "Skip to content",
+    "navigation": "Main navigation",
+    "index": "Document index",
+    "validity": "90 days",
+    "readiness": "Bid readiness",
+    "ready": "Ready to generate",
+    "assembling": "Bringing your bid together",
+    "seeWorkflow": "See the workflow",
+    "deskLabel": "THE DIGITAL TENDER DESK",
+    "sampleSignature": "Sample signature",
+    "agreement": "JV Agreement",
+    "paperToWorkspace": "Paperwork, finding its place.",
+    "workspaceSubtitle": "Joint Venture Bid Workspace",
+    "scrollNote": "Scroll to assemble your bid",
+    "comesTogether": "The bid comes together here.",
+    "comesTogetherBody": "Project details, partner profiles, signatures, and documents — structured in one workspace.",
+    "explore": "Take a closer look",
+    "lens": {
+      "project": "Start with the project once and keep the bid structure consistent.",
+      "partners": "Keep every partner’s reusable details close at hand.",
+      "documents": "Bring the documents needed for submission into one controlled flow."
+    },
+    "oneWorkspace": "One workspace. Everything in its place.",
+    "projectReady": "Project ready",
+    "ownership": "Total ownership",
+    "sampleOnly": "Fictional sample documents shown for illustration.",
+    "reuseTitle": "Prepare once. Reuse every time.",
+    "bidA": "Previous bid",
+    "bidB": "Your next bid",
+    "savedProfile": "Saved profile",
+    "profileReused": "Profile reused",
+    "reuseHint": "Same details. A fresh start.",
+    "chapters": "The details that make a bid",
+    "chapterLabel": "PRODUCT CHAPTERS",
+    "finalStep": "TENDERX / FINAL STEP",
+    "page": "PAGE 08 / 08",
+    "complete": "DOCUMENT COMPLETE",
+    "accessLabel": "TX / ACCESS / 01",
+    "accessBody": "Your work, ready when you are.",
+    "accessNote": "One place for your partners, projects, and paperwork.",
+    "reviewTitle": "Review your bid",
+    "reviewBody": "Check project details, partner shares, signatures, and supporting documents before generating.",
+    "generateTitle": "Generate documents",
+    "generateBody": "Turn your prepared bid into the PDFs you need for submission."
+  },
   "app": {
     "name": "TenderX Nepal",
     "tagline": "Joint Venture Bid Workspace"
   },
   "common": {
     "somethingWrong": "Something went wrong.",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "backToHome": "Back to home",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "required": "Required"
   },
   "home": {
     "description": "Prepare partner details once, reuse them across every bid, and generate accurate joint-venture tender documents in minutes.",
@@ -137,5 +200,237 @@
   "language": {
     "english": "English",
     "nepali": "नेपाली"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "getStarted": "Get started",
+      "logIn": "Log in",
+      "menu": "Menu",
+      "close": "Close menu"
+    },
+    "hero": {
+      "photoAlt": "Two fictional contractors: one stressed by scattered bidding documents, the other relaxed at an organised laptop workspace.",
+      "beforeLabel": "Before TenderX",
+      "afterLabel": "With TenderX",
+      "beforeEyebrow": "Too much paperwork",
+      "beforeTitle": "The familiar pressure.",
+      "afterEyebrow": "One organised workspace",
+      "afterTitle": "A little more peace of mind.",
+      "photoNote": "Illustrative scene · AI-generated",
+      "summary": "Bring your partners, signatures, and documents together. Prepare your joint-venture bid in one organised workspace.",
+      "eyebrow": "Built for Nepali contractors",
+      "titleLine1": "Your next bid,",
+      "titleLine2": "made simpler.",
+      "description": "Prepare joint-venture bids with your partner details, signatures, and documents in one place. Save the work you’ve already done and use it again on your next bid.",
+      "primaryCta": "Create your workspace",
+      "secondaryCta": "How it works",
+      "trustNote": "Free trial. No credit card required."
+    },
+    "localProof": {
+      "title": "Made for the way Nepal builds.",
+      "description": "A workspace for Nepali contractors and their partners."
+    },
+    "preview": {
+      "eyebrow": "Your bid, coming together",
+      "samplePill": "Sample bid",
+      "tabs": {
+        "project": "Project",
+        "partners": "Partners",
+        "documents": "Documents"
+      },
+      "project": {
+        "header": "Joint venture workspace",
+        "panelTitle": "Project details",
+        "projectName": "Road improvement works",
+        "jvName": "Summit · Valley · Horizon JV",
+        "bidType": "Joint venture",
+        "progressLabel": "Sample details complete",
+        "progressValue": "100%"
+      },
+      "partners": {
+        "header": "Partner profiles",
+        "lead": "Lead partner",
+        "first": "First partner",
+        "second": "Second partner",
+        "companyOne": "Summit Builders Pvt. Ltd.",
+        "companyTwo": "Valley Engineering Works",
+        "companyThree": "Horizon Infrastructure",
+        "profileReady": "Profile ready",
+        "signature": "Signature",
+        "stamp": "Stamp",
+        "uploaded": "Uploaded",
+        "access": "Access",
+        "reusable": "Reusable profile"
+      },
+      "documents": {
+        "header": "Bid documents",
+        "bidDocument": "Joint venture bid document",
+        "signatures": "Signatures & company stamps",
+        "supporting": "Supporting documents",
+        "ready": "Ready",
+        "generatePreview": "Generate (preview)",
+        "note": "This is a sample preview. Documents are generated inside your workspace."
+      },
+      "footer": {
+        "title": "Your details. One organised place.",
+        "badgeTitle": "One place for your paperwork",
+        "badgeBody": "Save details. Reuse them on your next bid.",
+        "hint": "Explore a sample workspace above"
+      }
+    },
+    "valueStrip": {
+      "title": "Less admin. More progress.",
+      "items": {
+        "one": "Prepare once, reuse every time",
+        "two": "Keep every partner in order",
+        "three": "Generate your bid documents"
+      }
+    },
+    "reuse": {
+      "eyebrow": "Prepare once. Reuse every time.",
+      "title": "Your company profiles, ready for the next bid.",
+      "description": "Save partner companies, authorised people, signatures, and stamps once. Bring them into every new joint venture without starting from a blank page.",
+      "points": {
+        "one": "Reusable partner and company profiles",
+        "two": "Signatures and stamps kept with each partner",
+        "three": "Carried into each new bid in a click"
+      },
+      "cardLabel": "Saved profile",
+      "cardTitle": "Himalaya Builders Pvt. Ltd.",
+      "cardMeta": "Reused in 4 bids",
+      "reuseTag": "Reuse"
+    },
+    "docgen": {
+      "eyebrow": "From details to documents",
+      "title": "Generate the bid documents you need.",
+      "description": "Turn the details you have already entered into a tender document, then produce clean PDFs for the sections your submission requires.",
+      "outputTitle": "Generated documents",
+      "docs": {
+        "one": "Joint venture agreement",
+        "two": "Bid submission letter",
+        "three": "Partner authorisation"
+      },
+      "ready": "Ready",
+      "generate": "Generate documents"
+    },
+    "features": {
+      "eyebrow": "The details, taken care of",
+      "titleLine1": "Less searching.",
+      "titleLine2": "More getting things done.",
+      "description": "Keep the details you use most close at hand, from company profiles to the documents you’re ready to submit.",
+      "items": {
+        "one": {
+          "title": "Save your partner details",
+          "body": "Save company details and authorised people in reusable profiles. Bring them into your next bid without starting over."
+        },
+        "two": {
+          "title": "Keep signatures together",
+          "body": "Keep signatures and company stamps with each partner, ready to use across your bid documents."
+        },
+        "three": {
+          "title": "Clear roles for every partner",
+          "body": "Dedicated partner sections, with access based on your plan, keep your joint venture organised."
+        },
+        "four": {
+          "title": "Turn details into documents",
+          "body": "Turn your bid details into a tender document, then generate PDFs for the sections you need."
+        }
+      }
+    },
+    "workflow": {
+      "eyebrow": "How it works",
+      "titleLine1": "From a new project",
+      "titleLine2": "to a prepared bid.",
+      "steps": {
+        "one": {
+          "title": "Add your partners",
+          "body": "Create company profiles, add authorised people, and upload signatures and stamps."
+        },
+        "two": {
+          "title": "Fill in the project",
+          "body": "Add project details, set each partner’s share, and review your bid’s readiness."
+        },
+        "three": {
+          "title": "Review and generate",
+          "body": "Save your draft, generate your bid, and download the documents for your next submission."
+        }
+      }
+    },
+    "closing": {
+      "eyebrow": "Your next opportunity starts here",
+      "title": "Ready to make your next bid easier?",
+      "trialNote": "Free trial. No credit card required."
+    },
+    "footer": {
+      "tagline": "Joint Venture Bid Workspace",
+      "productTitle": "Product",
+      "accountTitle": "Account",
+      "languageTitle": "Language",
+      "madeFor": "Made for the work ahead.",
+      "copyright": "© TenderX"
+    }
+  },
+  "publicAuth": {
+    "visual": {
+      "eyebrow": "A clearer way to prepare your next bid",
+      "title": "Less paperwork.",
+      "accent": "More possibilities.",
+      "description": "Bring your partners, agreements, and tender documents together. Make room for the work that matters.",
+      "imageAlt": "A contractor reviews paper files while another professional works confidently in a digital workspace.",
+      "transition": "From paper to progress",
+      "documentTitle": "Your bid, brought together",
+      "documentDetail": "Partners · Agreements · Documents",
+      "saveTime": "Save time",
+      "reduceErrors": "Reduce errors",
+      "stayOrganized": "Stay organized"
+    },
+    "imageDescription": "Tendering, simplified. TenderX Nepal turns scattered paperwork into an organized digital workspace to save time, reduce errors, and prepare tender documents.",
+    "storyTitle": "Your next bid.",
+    "storyAccent": "All in one place.",
+    "storyDescription": "Keep partner details, signatures, and bid documents together, so there’s less to sort out next time.",
+    "rows": {
+      "partner": "Partner profile",
+      "signature": "Signature & stamp",
+      "document": "Bid document"
+    },
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Log in to pick up where you left off."
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start your free trial and get your first bid organised.",
+      "passwordHint": "Use at least 8 characters.",
+      "submit": "Create account",
+      "trialNote": "Free trial. No credit card required."
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your account email. We’ll send you a link to reset your password."
+    },
+    "reset": {
+      "title": "Set a new password",
+      "subtitle": "Choose a password with at least 8 characters to get back into your account.",
+      "passwordHint": "Use at least 8 characters.",
+      "missingLink": "This reset link is missing or invalid. Request a new one to continue."
+    },
+    "verify": {
+      "title": "Verify your email",
+      "message": "We sent a verification link to {email}. Click it to activate your account.",
+      "supporting": "Open the link we emailed you to activate your account and start preparing bids.",
+      "resend": "Resend verification email",
+      "backHome": "Back to home",
+      "backLogin": "Back to login",
+      "verifying": "Verifying your email…",
+      "successTitle": "Email verified",
+      "successBody": "Your account is ready to use.",
+      "goToWorkspace": "Go to Bid Workspace",
+      "failTitle": "Verification failed",
+      "failBody": "We couldn’t verify that link. It may have expired or already been used.",
+      "missingToken": "No verification link was found.",
+      "requestNew": "Request a new verification email"
+    }
   }
 }

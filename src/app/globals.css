@@ -2,22 +2,195 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------
+   TenderX public + auth design tokens (design v2 §70).
+   Blue + white "document ink" system, light-first (§71).
+   The authenticated app keeps its own evergreen theme and is untouched.
+   ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
+
+  --color-primary: #155eef;
+  --color-primary-hover: #0b4fd8;
+  --color-primary-deep: #102a56;
+
+  --color-blue-bright: #3b82f6;
+  --color-blue-soft: #dcebff;
+  --color-blue-pale: #eef5ff;
+
+  --color-background: #f7faff;
+  --color-surface: #ffffff;
+
+  --color-ink: #101828;
+  --color-ink-soft: #344054;
+  --color-muted: #667085;
+
+  --color-border: #dde5f0;
+  --color-border-strong: #c5d1e1;
+
+  --color-success: #16835d;
+  --color-warning: #b7791f;
+  --color-danger: #c73a4a;
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(16, 42, 86, 0.03), 0 6px 16px rgba(16, 42, 86, 0.05);
+  --shadow-md: 0 16px 40px rgba(16, 42, 86, 0.08);
+  --shadow-hero: 0 30px 80px rgba(21, 94, 239, 0.14);
+
+  --container-max: 1240px;
+  --container-narrow: 760px;
+  --page-gutter: 40px;
 }
 
-html.dark {
-  color-scheme: dark;
+@media (max-width: 1023px) {
+  :root {
+    --page-gutter: 28px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --page-gutter: 20px;
+  }
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  @apply bg-ink-50 text-ink-900 antialiased;
+  @apply bg-canvas font-sans text-body text-slate-700 antialiased;
+  font-weight: 450;
 }
 
-html.dark body {
-  @apply bg-ink-950 text-ink-100;
-}
-
+[lang="ne"] body,
 [lang="ne"] {
-  @apply font-devanagari leading-relaxed;
+  @apply font-devanagari;
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  @apply text-slate-900;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(21, 94, 239, 0.32);
+  border-radius: 4px;
+}
+
+::selection {
+  background: rgba(21, 94, 239, 0.16);
+}
+
+@layer components {
+  .container-x {
+    width: min(100% - (2 * var(--page-gutter)), var(--container-max));
+    margin-inline: auto;
+  }
+
+  .container-narrow {
+    width: min(100% - (2 * var(--page-gutter)), var(--container-narrow));
+    margin-inline: auto;
+  }
+
+  .section-y {
+    @apply py-16 md:py-28 lg:py-36;
+  }
+
+  .eyebrow {
+    @apply text-eyebrow uppercase text-blue-500;
+  }
+
+  .btn-primary {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-button bg-blue-500 px-5 text-[15px] font-semibold text-white transition duration-140 hover:-translate-y-px hover:bg-blue-600 focus-visible:shadow-focus active:translate-y-0 disabled:pointer-events-none disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-button border border-slate-300 bg-white px-5 text-[15px] font-semibold text-blue-800 transition duration-140 hover:bg-blue-50 focus-visible:shadow-focus disabled:pointer-events-none disabled:opacity-60;
+  }
+
+  .btn-ghost {
+    @apply inline-flex h-12 items-center justify-center gap-2 rounded-button px-2 text-[15px] font-semibold text-blue-600 transition duration-140 hover:text-blue-700 focus-visible:shadow-focus;
+  }
+
+  .btn-text {
+    @apply inline-flex items-center gap-1.5 font-semibold text-blue-600 underline-offset-4 hover:underline focus-visible:shadow-focus;
+  }
+
+  .card {
+    @apply rounded-lg border border-slate-200 bg-white shadow-card-blue;
+  }
+
+  .input-base {
+    @apply h-12 w-full rounded-input border border-slate-300 bg-white px-3.5 text-body text-slate-900 outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:shadow-focus max-md:h-[50px];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-pill bg-blue-100 px-2.5 py-1 text-[12px] font-semibold text-blue-700;
+  }
+}
+
+/* Scroll reveal — visible by default, hidden only when JS arms it (§58). */
+.reveal {
+  opacity: 1;
+}
+
+.reveal-ready .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 450ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-ready .reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Faint technical/document grid behind the hero (§26). */
+.drafting-grid {
+  background-image:
+    linear-gradient(rgba(21, 94, 239, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 94, 239, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 100ms !important;
+  }
+
+  .reveal-ready .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }
