@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { inputClass, labelClass } from "@/components/ui/styles";
 import { useBid } from "@/lib/bid-context";
 
 export function TextField({
@@ -8,26 +10,42 @@ export function TextField({
   span = 1,
   type = "text",
   mono = false,
+  placeholder,
+  hint,
+  suffix,
+  inputMode,
 }: {
   fieldKey: string;
   label: string;
   span?: 1 | 2;
   type?: string;
   mono?: boolean;
+  placeholder?: string;
+  hint?: string;
+  suffix?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 }) {
   const { fieldData, setField } = useBid();
 
   return (
     <label className={span === 2 ? "sm:col-span-2" : undefined}>
-      <span className="mb-1.5 block text-xs font-medium text-ink-600 dark:text-ink-400">{label}</span>
-      <input
-        type={type}
-        value={fieldData[fieldKey] ?? ""}
-        onChange={(e) => setField(fieldKey, e.target.value)}
-        className={`h-9 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100 ${
-          mono ? "font-mono tabular-nums" : ""
-        }`}
-      />
+      <span className={labelClass}>{label}</span>
+      <div className="relative">
+        <input
+          type={type}
+          inputMode={inputMode}
+          value={fieldData[fieldKey] ?? ""}
+          placeholder={placeholder}
+          onChange={(e) => setField(fieldKey, e.target.value)}
+          className={`${inputClass} ${mono ? "font-mono tabular-nums" : ""} ${suffix ? "pr-10" : ""}`}
+        />
+        {suffix && (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-semibold text-slate-400">
+            {suffix}
+          </span>
+        )}
+      </div>
+      {hint && <span className="mt-1.5 block text-xs text-slate-500">{hint}</span>}
     </label>
   );
 }
@@ -37,24 +55,28 @@ export function SelectField({
   label,
   options,
   span = 1,
+  hint,
 }: {
   fieldKey: string;
   label: string;
   options: { value: string; label: string }[];
   span?: 1 | 2;
+  hint?: string;
 }) {
+  const t = useTranslations("dash.form");
   const { fieldData, setField } = useBid();
 
   return (
     <label className={span === 2 ? "sm:col-span-2" : undefined}>
-      <span className="mb-1.5 block text-xs font-medium text-ink-600 dark:text-ink-400">{label}</span>
+      <span className={labelClass}>{label}</span>
       <select
         value={fieldData[fieldKey] ?? ""}
         onChange={(e) => setField(fieldKey, e.target.value)}
-        className="h-9 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm text-ink-900 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-ink-700 dark:bg-ink-950 dark:text-ink-100"
+        disabled={options.length === 0}
+        className={inputClass}
       >
         <option value="" disabled>
-          Select…
+          {t("select")}
         </option>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -62,6 +84,7 @@ export function SelectField({
           </option>
         ))}
       </select>
+      {hint && <span className="mt-1.5 block text-xs text-slate-500">{hint}</span>}
     </label>
   );
 }

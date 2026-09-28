@@ -1,158 +1,274 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, LayoutGrid, Save, Users, X } from "lucide-react";
+import {
+  Building2,
+  Check,
+  ChevronDown,
+  ChevronsLeft,
+  ExternalLink,
+  FileDown,
+  FileText,
+  FolderOpen,
+  LayoutDashboard,
+  Plus,
+  UserPlus,
+  Users,
+  Contact,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { api } from "@/lib/api";
+import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { saveDraft, useBid, type DraftOut } from "@/lib/bid-context";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useBid } from "@/lib/bid-context";
+import { useStartNewBid } from "@/lib/bid-actions";
+import { stepComplete } from "@/lib/validation";
+import { isStep, useWorkspace, type StepKey, type ViewKey } from "@/lib/workspace-context";
 
-type DraftSummary = { id: string; name: string; updated_at: string };
+type NavItem = { key: ViewKey; icon: LucideIcon };
+type NavGroup = { id: "builder" | "library"; items: NavItem[] };
 
-export type TabKey = "project" | "lead" | "first" | "second";
-
-const TAB_ORDER: { key: TabKey; icon: typeof LayoutGrid }[] = [
-  { key: "project", icon: LayoutGrid },
-  { key: "lead", icon: Users },
-  { key: "first", icon: Users },
-  { key: "second", icon: Users },
+const GROUPS: NavGroup[] = [
+  {
+    id: "builder",
+    items: [
+      { key: "lead", icon: Building2 },
+      { key: "first", icon: Users },
+      { key: "second", icon: UserPlus },
+      { key: "project", icon: FileText },
+    ],
+  },
+  {
+    id: "library",
+    items: [
+      { key: "bids", icon: FolderOpen },
+      { key: "profiles", icon: Contact },
+      { key: "documents", icon: FileDown },
+    ],
+  },
 ];
 
+/** Which builder steps this user can see, and which are disabled for the current bid type. */
+export function useStepAccess() {
+  const { user } = useAuth();
+  const { fieldData } = useBid();
+  const isSingle = fieldData.BID_TYPE === "Single Bidder";
+  return (step: StepKey) => {
+    const permitted =
+      step === "first" ? Boolean(user?.can_use_first_partner) : step === "second" ? Boolean(user?.can_use_second_partner) : true;
+    const disabled = isSingle && (step === "first" || step === "second");
+    return { visible: permitted, disabled };
+  };
+}
+
 export function Sidebar({
-  activeTab,
-  onTabChange,
   isOpen,
   onClose,
+  collapsed,
+  onToggleCollapsed,
 }: {
-  activeTab: TabKey;
-  onTabChange: (tab: TabKey) => void;
   isOpen: boolean;
   onClose: () => void;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 }) {
-  const t = useTranslations("nav");
-  const tApp = useTranslations("app");
-  const tAuth = useTranslations("auth");
-  const { user, logout } = useAuth();
-  const { draftId, draftName, fieldData, loadDraft, newBid } = useBid();
-  const queryClient = useQueryClient();
-  const isSingle = fieldData.BID_TYPE === "Single Bidder";
+  const t = useTranslations("dash.nav");
+  const { user } = useAuth();
+  const { fieldData } = useBid();
+  const { view, setView } = useWorkspace();
+  const stepAccess = useStepAccess();
+  const startNewBid = useStartNewBid();
+  const [closedGroups, setClosedGroups] = useState<Record<string, boolean>>({});
 
-  const { data: drafts } = useQuery({
-    queryKey: ["drafts"],
-    queryFn: () => api.get<DraftSummary[]>("/drafts"),
-  });
+  function go(key: ViewKey) {
+    setView(key);
+    onClose();
+  }
 
-  const save = useMutation({
-    mutationFn: () => saveDraft(draftId, draftName || fieldData.JV_NAME || t("untitledBid"), fieldData),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["drafts"] }),
-  });
-
-  const openDraft = useMutation({
-    mutationFn: (id: string) => api.get<DraftOut>(`/drafts/${id}`),
-    onSuccess: (draft) => loadDraft(draft),
-  });
+  // Collapsed rail only applies on desktop; the mobile drawer is always full width.
+  const narrow = collapsed ? "lg:w-[76px]" : "lg:w-64";
+  const hideWhenNarrow = collapsed ? "lg:hidden" : "";
 
   return (
     <>
-      {isOpen && (
-        <div
-          onClick={onClose}
-          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
-          aria-hidden="true"
-        />
-      )}
+      {isOpen && <div onClick={onClose} className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" aria-hidden="true" />}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 -translate-x-full flex-col border-r border-ink-200 bg-white transition-transform duration-200 dark:border-ink-800 dark:bg-ink-900 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 shrink-0 -translate-x-full flex-col border-r border-slate-200 bg-white transition-[transform,width] duration-200 lg:static lg:translate-x-0 ${narrow} ${
           isOpen ? "translate-x-0" : ""
         }`}
       >
-      <div className="flex items-center gap-2.5 border-b border-ink-100 px-4 py-4 dark:border-ink-800">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500 text-sm font-bold text-white">
-          TX
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold leading-tight text-ink-900 dark:text-ink-100">{tApp("name")}</p>
-          <p className="truncate text-[11px] leading-tight text-ink-500">{user?.email}</p>
-        </div>
-        <button onClick={onClose} className="shrink-0 text-ink-400 hover:text-ink-600 lg:hidden" aria-label="Close menu">
-          <X size={18} />
-        </button>
-      </div>
-
-      <div className="border-b border-ink-100 p-3 dark:border-ink-800">
-        <select
-          value={draftId ?? ""}
-          onChange={(e) => {
-            if (e.target.value === "__new__") newBid();
-            else if (e.target.value) openDraft.mutate(e.target.value);
-          }}
-          className="h-9 w-full rounded-lg border border-ink-200 bg-white px-2.5 text-xs font-medium text-ink-800 outline-none focus:border-brand-500 dark:border-ink-700 dark:bg-ink-950 dark:text-ink-200"
-        >
-          <option value="">{t("currentBid")}</option>
-          {(drafts ?? []).map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-          <option value="__new__">{t("newBid")}</option>
-        </select>
-        <button
-          onClick={() => save.mutate()}
-          disabled={save.isPending}
-          className="mt-2 flex h-8 w-full items-center justify-center gap-1.5 rounded-lg bg-brand-500 text-xs font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-50"
-        >
-          <Save size={13} />
-          {save.isPending ? t("saving") : draftId ? t("update") : t("save")}
-        </button>
-      </div>
-
-      <nav className="flex-1 space-y-0.5 p-2.5">
-        {TAB_ORDER.filter(({ key }) => {
-          if (key === "first" && !user?.can_use_first_partner) return false;
-          if (key === "second" && !user?.can_use_second_partner) return false;
-          return true;
-        }).map(({ key, icon: Icon }) => {
-          const disabled = (key === "first" || key === "second") && isSingle;
-          return (
-            <button
-              key={key}
-              onClick={() => onTabChange(key)}
-              disabled={disabled}
-              className={`flex h-9 w-full items-center gap-2.5 rounded-lg px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-                activeTab === key
-                  ? "bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400"
-                  : "text-ink-600 hover:bg-ink-50 dark:text-ink-400 dark:hover:bg-ink-800"
-              }`}
-            >
-              <Icon size={15} />
-              {key === "project" ? t("projectInfo") : t(`${key}Partner` as any)}
-            </button>
-          );
-        })}
-      </nav>
-
-      {user?.is_admin && (
-        <div className="px-2.5 pb-2">
-          <a
-            href={process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex h-9 w-full items-center gap-2.5 rounded-lg px-3 text-sm font-medium text-ink-600 transition-colors hover:bg-ink-50 dark:text-ink-400 dark:hover:bg-ink-800"
+        {/* Brand */}
+        <div className={`flex h-16 shrink-0 items-center gap-3 border-b border-slate-200 px-4 ${collapsed ? "lg:justify-center lg:px-0" : ""}`}>
+          <Image src="/logo.png" alt="TenderX" width={40} height={26} className="h-7 w-auto shrink-0" priority />
+          <div className={`min-w-0 flex-1 ${hideWhenNarrow}`}>
+            <p className="truncate text-[15px] font-bold leading-tight text-slate-900">
+              Tender<span className="text-blue-500">X</span> Nepal
+            </p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">{t("workspace")}</p>
+          </div>
+          <button
+            onClick={onToggleCollapsed}
+            className={`hidden rounded-xs p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 lg:block ${hideWhenNarrow}`}
+            aria-label={t("collapse")}
+            title={t("collapse")}
           >
-            <ExternalLink size={15} />
-            Admin Dashboard
-          </a>
+            <ChevronsLeft size={18} />
+          </button>
+          <button onClick={onClose} className="rounded-xs p-1 text-slate-400 hover:text-slate-600 lg:hidden" aria-label={t("closeMenu")}>
+            <X size={18} />
+          </button>
         </div>
-      )}
 
-      <div className="flex items-center justify-between border-t border-ink-100 p-3 dark:border-ink-800">
-        <LanguageSwitcher />
-        <button onClick={logout} className="text-xs font-medium text-ink-500 hover:text-red-500">
-          {tAuth("logout")}
-        </button>
-      </div>
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          {collapsed && (
+            <button
+              onClick={onToggleCollapsed}
+              className="mb-3 hidden h-10 w-full items-center justify-center rounded-sm text-slate-400 hover:bg-slate-100 hover:text-slate-600 lg:flex"
+              aria-label={t("expand")}
+              title={t("expand")}
+            >
+              <ChevronsLeft size={18} className="rotate-180" />
+            </button>
+          )}
+
+          <NavButton
+            label={t("dashboard")}
+            icon={LayoutDashboard}
+            active={view === "dashboard"}
+            collapsed={collapsed}
+            onClick={() => go("dashboard")}
+          />
+
+          <button
+            onClick={() => {
+              startNewBid();
+              onClose();
+            }}
+            title={collapsed ? t("newBid") : undefined}
+            className={`mt-1 flex h-10 w-full items-center gap-3 rounded-sm px-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 ${
+              collapsed ? "lg:justify-center lg:px-0" : ""
+            }`}
+          >
+            <Plus size={18} className="shrink-0" />
+            <span className={hideWhenNarrow}>{t("newBid")}</span>
+          </button>
+
+          {GROUPS.map((group) => {
+            const isClosed = closedGroups[group.id] && !collapsed;
+            return (
+              <div key={group.id} className="mt-5">
+                <button
+                  onClick={() => setClosedGroups((prev) => ({ ...prev, [group.id]: !prev[group.id] }))}
+                  className={`mb-1 flex w-full items-center justify-between px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 hover:text-slate-600 ${hideWhenNarrow}`}
+                >
+                  {t(group.id)}
+                  <ChevronDown size={14} className={`transition-transform ${isClosed ? "-rotate-90" : ""}`} />
+                </button>
+                {collapsed && <div className="mx-3 mb-2 hidden border-t border-slate-200 lg:block" />}
+
+                {!isClosed && (
+                  <div className="space-y-0.5">
+                    {group.items.map(({ key, icon }) => {
+                      if (isStep(key)) {
+                        const access = stepAccess(key);
+                        if (!access.visible) return null;
+                        return (
+                          <NavButton
+                            key={key}
+                            label={t(key)}
+                            icon={icon}
+                            active={view === key}
+                            collapsed={collapsed}
+                            disabled={access.disabled}
+                            disabledHint={t("singleBidderHint")}
+                            done={stepComplete(fieldData, key)}
+                            onClick={() => go(key)}
+                          />
+                        );
+                      }
+                      return (
+                        <NavButton
+                          key={key}
+                          label={t(key)}
+                          icon={icon}
+                          active={view === key}
+                          collapsed={collapsed}
+                          onClick={() => go(key)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {user?.is_admin && (
+            <div className="mt-5">
+              <p className={`mb-1 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 ${hideWhenNarrow}`}>
+                {t("admin")}
+              </p>
+              <a
+                href={process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={collapsed ? t("adminDashboard") : undefined}
+                className={`flex h-10 w-full items-center gap-3 rounded-sm px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 ${
+                  collapsed ? "lg:justify-center lg:px-0" : ""
+                }`}
+              >
+                <ExternalLink size={18} className="shrink-0 text-slate-400" />
+                <span className={hideWhenNarrow}>{t("adminDashboard")}</span>
+              </a>
+            </div>
+          )}
+        </nav>
       </aside>
     </>
+  );
+}
+
+function NavButton({
+  label,
+  icon: Icon,
+  active,
+  collapsed,
+  disabled,
+  disabledHint,
+  done,
+  onClick,
+}: {
+  label: string;
+  icon: LucideIcon;
+  active: boolean;
+  collapsed: boolean;
+  disabled?: boolean;
+  disabledHint?: string;
+  done?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={disabled ? disabledHint : collapsed ? label : undefined}
+      className={`relative flex h-10 w-full items-center gap-3 rounded-sm px-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${
+        collapsed ? "lg:justify-center lg:px-0" : ""
+      } ${active ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}`}
+    >
+      {active && <span className="absolute inset-y-2 left-0 w-[3px] rounded-r bg-blue-500" aria-hidden="true" />}
+      <Icon size={18} className={`shrink-0 ${active ? "text-blue-600" : "text-slate-400"}`} />
+      <span className={`flex-1 truncate text-left ${collapsed ? "lg:hidden" : ""}`}>{label}</span>
+      {done && (
+        <span
+          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white ${
+            collapsed ? "lg:absolute lg:right-2 lg:top-1.5 lg:h-3.5 lg:w-3.5" : ""
+          }`}
+        >
+          <Check size={10} strokeWidth={3} />
+        </span>
+      )}
+    </button>
   );
 }

@@ -18,14 +18,24 @@ type BidContextValue = {
   draftName: string;
   fieldData: FieldData;
   images: Record<string, string>; // img_key -> storage_path
+  /** Saved partner profile each role was loaded from / saved to (role -> profile id). Persisted on the draft. */
+  linkedProfiles: Record<string, string>;
   jvNameManuallySet: boolean;
+  isDirty: boolean;
   setField: (key: string, value: string) => void;
   setFields: (patch: FieldData) => void;
   setImage: (imgKey: string, storagePath: string) => void;
+  setLinkedProfile: (role: string, profileId: string | null) => void;
   loadDraft: (draft: DraftOut) => void;
   newBid: () => void;
   setDraftMeta: (id: string, name: string) => void;
+  /** Record a successful save: sets the draft id/name and resets the dirty baseline. */
+  markSaved: (id: string, name: string, saved: SavedSnapshot) => void;
 };
+
+export type SavedSnapshot = { fieldData: FieldData; linkedProfiles: Record<string, string> };
+
+const snapshotJson = (s: SavedSnapshot) => JSON.stringify([s.fieldData, s.linkedProfiles]);
 
 const BidContext = createContext<BidContextValue | null>(null);
 
@@ -40,7 +50,11 @@ export function BidProvider({ children }: { children: React.ReactNode }) {
   const [draftName, setDraftName] = useState("");
   const [fieldData, setFieldData] = useState<FieldData>(EMPTY_FIELD_DATA);
   const [images, setImages] = useState<Record<string, string>>({});
+  const [linkedProfiles, setLinkedProfiles] = useState<Record<string, string>>({});
   const [jvNameManuallySet, setJvNameManuallySet] = useState(false);
+  // Snapshot of the last saved/loaded state, used to detect unsaved changes.
+  const [savedJson, setSavedJson] = useState(() => snapshotJson({ fieldData: EMPTY_FIELD_DATA, linkedProfiles: {} }));
+  const isDirty = snapshotJson({ fieldData, linkedProfiles }) !== savedJson;
 
   const setField = useCallback(
     (key: string, value: string) => {
@@ -71,10 +85,21 @@ export function BidProvider({ children }: { children: React.ReactNode }) {
     setImages((prev) => ({ ...prev, [imgKey]: storagePath }));
   }, []);
 
+  const setLinkedProfile = useCallback((role: string, profileId: string | null) => {
+    setLinkedProfiles((prev) => {
+      const next = { ...prev };
+      if (profileId) next[role] = profileId;
+      else delete next[role];
+      return next;
+    });
+  }, []);
+
   const loadDraft = useCallback((draft: DraftOut) => {
     setDraftId(draft.id);
     setDraftName(draft.name);
     setFieldData(draft.field_data);
+    setLinkedProfiles(draft.linked_profiles ?? {});
+    setSavedJson(snapshotJson({ fieldData: draft.field_data, linkedProfiles: draft.linked_profiles ?? {} }));
     setJvNameManuallySet(Boolean(draft.field_data.JV_NAME));
     const imgMap: Record<string, string> = {};
     for (const img of draft.images) imgMap[img.img_key] = img.storage_path;
@@ -85,6 +110,8 @@ export function BidProvider({ children }: { children: React.ReactNode }) {
     setDraftId(null);
     setDraftName("");
     setFieldData(EMPTY_FIELD_DATA);
+    setLinkedProfiles({});
+    setSavedJson(snapshotJson({ fieldData: EMPTY_FIELD_DATA, linkedProfiles: {} }));
     setImages({});
     setJvNameManuallySet(false);
   }, []);
@@ -94,21 +121,47 @@ export function BidProvider({ children }: { children: React.ReactNode }) {
     setDraftName(name);
   }, []);
 
+  const markSaved = useCallback((id: string, name: string, saved: SavedSnapshot) => {
+    setDraftId(id);
+    setDraftName(name);
+    setSavedJson(snapshotJson(saved));
+  }, []);
+
   const value = useMemo(
     () => ({
       draftId,
       draftName,
       fieldData,
       images,
+      linkedProfiles,
       jvNameManuallySet,
+      isDirty,
       setField,
       setFields,
       setImage,
+      setLinkedProfile,
       loadDraft,
       newBid,
       setDraftMeta,
+      markSaved,
     }),
-    [draftId, draftName, fieldData, images, jvNameManuallySet, setField, setFields, setImage, loadDraft, newBid, setDraftMeta]
+    [
+      draftId,
+      draftName,
+      fieldData,
+      images,
+      linkedProfiles,
+      jvNameManuallySet,
+      isDirty,
+      setField,
+      setFields,
+      setImage,
+      setLinkedProfile,
+      loadDraft,
+      newBid,
+      setDraftMeta,
+      markSaved,
+    ]
   );
 
   return <BidContext.Provider value={value}>{children}</BidContext.Provider>;
@@ -120,9 +173,10 @@ export function useBid() {
   return ctx;
 }
 
-export async function saveDraft(draftId: string | null, name: string, fieldData: FieldData) {
+export async function saveDraft(draftId: string | null, name: string, saved: SavedSnapshot) {
+  const body = { name, field_data: saved.fieldData, linked_profiles: saved.linkedProfiles };
   if (draftId) {
-    return api.put<DraftOut>(`/drafts/${draftId}`, { name, field_data: fieldData });
+    return api.put<DraftOut>(`/drafts/${draftId}`, body);
   }
-  return api.post<DraftOut>("/drafts", { name, field_data: fieldData });
+  return api.post<DraftOut>("/drafts", body);
 }

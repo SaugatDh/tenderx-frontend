@@ -43,6 +43,20 @@ export function suggestedJvName(fieldData: FieldData): string {
   return `${shorts.join(" - ")} J/V`;
 }
 
+/** Whether a bid-builder step has its essential fields filled (drives the stepper checkmarks). */
+export function stepComplete(fieldData: FieldData, step: "project" | "lead" | "first" | "second"): boolean {
+  switch (step) {
+    case "project":
+      return Boolean(fieldData.JV_NAME && fieldData.PROJECT_NAME && fieldData.EMPLOYER_NAME);
+    case "lead":
+      return Boolean(fieldData.LEAD_PARTNER_NAME && fieldData.L_PER);
+    case "first":
+      return Boolean(fieldData.FIRST_PARTNER_NAME && fieldData.F_PER);
+    case "second":
+      return Boolean(fieldData.SECOND_PARTNER_NAME && fieldData.S_PER);
+  }
+}
+
 export type Readiness = {
   partnerNamesFilled: boolean;
   splitComplete: boolean;

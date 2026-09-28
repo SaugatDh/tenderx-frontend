@@ -18,15 +18,13 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <div className="inline-flex items-center rounded-full border border-ink-200 bg-white p-0.5 text-xs font-medium dark:border-ink-700 dark:bg-ink-900">
+    <div className="inline-flex items-center rounded-sm border border-slate-200 bg-slate-50 p-0.5 text-xs font-semibold">
       {(["en", "ne"] as const).map((code) => (
         <button
           key={code}
           onClick={() => switchTo(code)}
-          className={`rounded-full px-3 py-1 transition-colors ${
-            locale === code
-              ? "bg-brand-500 text-white"
-              : "text-ink-500 hover:text-ink-900 dark:hover:text-ink-100"
+          className={`rounded-xs px-2.5 py-1.5 transition-colors ${
+            locale === code ? "bg-white text-blue-700 shadow-sm" : "text-slate-500 hover:text-slate-900"
           }`}
         >
           {code === "en" ? t("english") : t("nepali")}

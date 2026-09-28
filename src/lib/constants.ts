@@ -24,6 +24,17 @@ export const ATTACHMENT_CATEGORIES = [
 ] as const;
 export type AttachmentCategory = (typeof ATTACHMENT_CATEGORIES)[number];
 
+/** Partner profile columns ↔ role-prefixed bid field suffixes (e.g. partner_name ↔ LEAD_PARTNER_NAME). */
+export const PROFILE_FIELD_MAP = [
+  ["partner_name", "PARTNER_NAME"],
+  ["partner_short", "PARTNER_SHORT"],
+  ["address", "ADDRESS"],
+  ["partner_ceo", "PARTNER_CEO"],
+  ["partner_md1", "PARTNER_MD1"],
+  ["partner_md2", "PARTNER_MD2"],
+] as const;
+export type ProfileFieldKey = (typeof PROFILE_FIELD_MAP)[number][0];
+
 export function roleImageKeys(role: PartnerRole) {
   const p = ROLE_PREFIXES[role];
   return {
