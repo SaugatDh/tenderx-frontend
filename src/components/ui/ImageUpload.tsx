@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ImageUp, Loader2, Lock } from "lucide-react";
+import { CheckCircle2, ImageUp, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { api } from "@/lib/api";
@@ -20,6 +20,8 @@ export function ImageUpload({ imgKey, label }: { imgKey: string; label: string }
   const hasImage = Boolean(images[imgKey]);
   const canUpload = Boolean(user?.can_upload_signature_stamp);
 
+  if (!canUpload) return null;
+
   async function handleFile(file: File) {
     if (!draftId) return;
     setIsUploading(true);
@@ -38,9 +40,7 @@ export function ImageUpload({ imgKey, label }: { imgKey: string; label: string }
   }
 
   let status: { icon: React.ReactNode; text: string; tone: string };
-  if (!canUpload) {
-    status = { icon: <Lock size={16} />, text: t("locked"), tone: "text-slate-400" };
-  } else if (!draftId) {
+  if (!draftId) {
     status = { icon: <ImageUp size={16} />, text: t("saveFirst"), tone: "text-slate-400" };
   } else if (isUploading) {
     status = { icon: <Loader2 size={16} className="animate-spin" />, text: t("uploading"), tone: "text-blue-600" };
@@ -50,7 +50,7 @@ export function ImageUpload({ imgKey, label }: { imgKey: string; label: string }
     status = { icon: <ImageUp size={16} />, text: t("choose"), tone: "text-blue-600" };
   }
 
-  const disabled = !canUpload || !draftId || isUploading;
+  const disabled = !draftId || isUploading;
 
   return (
     <div>
@@ -58,7 +58,6 @@ export function ImageUpload({ imgKey, label }: { imgKey: string; label: string }
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={disabled}
-        title={!canUpload ? t("lockedHint") : undefined}
         className={`flex w-full items-center gap-3 rounded-sm border border-dashed px-3 py-2.5 text-left transition ${
           hasImage ? "border-emerald-300 bg-emerald-50/60" : "border-slate-300 bg-slate-50/60"
         } ${disabled ? "cursor-not-allowed" : "hover:border-blue-400 hover:bg-blue-50/60"}`}

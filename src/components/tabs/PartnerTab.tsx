@@ -65,7 +65,7 @@ export function PartnerTab({ role }: { role: PartnerRole }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <ReusableProfileCard role={role} />
+      <LoadProfileCard role={role} />
 
       <FormCard title={t("organisationDetails")} subtitle={tDash("organisationHint")} icon={Building2}>
         <TextField fieldKey={f("PARTNER_NAME")} label={t("partnerName")} placeholder={t("profileNamePlaceholder")} span={2} />
@@ -102,6 +102,8 @@ export function PartnerTab({ role }: { role: PartnerRole }) {
           hint={tDash("splitTotalNow", { value: split })}
         />
       </FormCard>
+
+      <SaveProfileCard role={role} />
 
       <AttachmentsCard role={role} />
     </div>
@@ -214,15 +216,14 @@ function AttachmentsCard({ role }: { role: PartnerRole }) {
 
 type ProfileOut = { id: string; name: string } & Record<ProfileFieldKey, string>;
 
-/** Load a saved partner profile into this role, keep it in sync (update), or save the details as a new one. */
-function ReusableProfileCard({ role }: { role: PartnerRole }) {
+/** Load a saved partner profile into this role and keep it in sync. */
+function LoadProfileCard({ role }: { role: PartnerRole }) {
   const t = useTranslations("partner");
   const tDash = useTranslations("dash.form");
   const tP = useTranslations("dash.profile");
   const { fieldData, setFields, linkedProfiles, setLinkedProfile } = useBid();
   const { notify } = useWorkspace();
   const queryClient = useQueryClient();
-  const [profileName, setProfileName] = useState("");
   const [selectedProfileId, setSelectedProfileId] = useState("");
 
   const f = (suffix: string) => roleFieldKey(role, suffix);
@@ -259,22 +260,6 @@ function ReusableProfileCard({ role }: { role: PartnerRole }) {
       notify("success", tDash("profileLoaded", { name: profile.partner_name }));
     },
     onError: (err) => notify("error", errorMessage(err, tDash("profileLoadFailed"))),
-  });
-
-  const saveAsProfile = useMutation({
-    mutationFn: () =>
-      api.post<ProfileOut>("/profiles", {
-        name: profileName || current.partner_name || t("untitledPartner"),
-        role,
-        ...current,
-      }),
-    onSuccess: (profile) => {
-      setLinkedProfile(role, profile.id);
-      setProfileName("");
-      refreshProfiles(profile.id);
-      notify("success", tDash("profileSaved"));
-    },
-    onError: (err) => notify("error", errorMessage(err, tDash("profileSaveFailed"))),
   });
 
   const updateProfile = useMutation({
@@ -380,9 +365,49 @@ function ReusableProfileCard({ role }: { role: PartnerRole }) {
           </button>
         </div>
       </div>
+    </FormCard>
+  );
+}
 
+/** Save current partner details as a new reusable profile. */
+function SaveProfileCard({ role }: { role: PartnerRole }) {
+  const t = useTranslations("partner");
+  const tDash = useTranslations("dash.form");
+  const tP = useTranslations("dash.profile");
+  const { fieldData, linkedProfiles, setLinkedProfile } = useBid();
+  const { notify } = useWorkspace();
+  const queryClient = useQueryClient();
+  const [profileName, setProfileName] = useState("");
+
+  const f = (suffix: string) => roleFieldKey(role, suffix);
+  const current = Object.fromEntries(
+    PROFILE_FIELD_MAP.map(([col, suffix]) => [col, fieldData[f(suffix)] ?? ""])
+  ) as Record<ProfileFieldKey, string>;
+
+  const linkedId = linkedProfiles[role];
+
+  const saveAsProfile = useMutation({
+    mutationFn: () =>
+      api.post<ProfileOut>("/profiles", {
+        name: profileName || current.partner_name || t("untitledPartner"),
+        role,
+        ...current,
+      }),
+    onSuccess: (profile) => {
+      setLinkedProfile(role, profile.id);
+      setProfileName("");
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["profile", profile.id] });
+      notify("success", tDash("profileSaved"));
+    },
+    onError: (err) => notify("error", errorMessage(err, tDash("profileSaveFailed"))),
+  });
+
+  if (linkedId) return null;
+
+  return (
+    <FormCard title={tP("saveNew")} icon={BookmarkPlus}>
       <div className="sm:col-span-2">
-        <span className={labelClass}>{tP("saveNew")}</span>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             value={profileName}
